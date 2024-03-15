@@ -34,7 +34,7 @@ class FrameStreamClient:
                         self.latest_result = res
                     else:
                         if not salvage_frame_stream(self.listener):
-                            raise "frame stream was corrupted and could not be salvaged"
+                            raise ValueError("frame stream was corrupted and could not be salvaged")
             except OSError:
                 self._latest_result = None
                 return
@@ -45,7 +45,7 @@ class FrameStreamClient:
 
     def start(self):
         if self.terminate_call.is_set():
-            raise "cannot restart a terminated stream client"
+            raise ValueError("cannot restart a terminated stream client")
         self.listen_worker.start()
                 
     def stop(self):
@@ -92,7 +92,7 @@ class MatchDataStreamClient:
                         self.latest_result = res
                     else: 
                         if not salvage_data_stream(self.listener):
-                            raise "data stream was corrupted and could not be salvaged"
+                            raise ValueError("data stream was corrupted and could not be salvaged")
             except TimeoutError:
                 self._latest_result = None
                 return
@@ -102,7 +102,7 @@ class MatchDataStreamClient:
 
     def start(self):
         if self.terminate_call.is_set():
-            raise "cannot restart a terminated stream client"
+            raise ValueError("cannot restart a terminated stream client")
         self.listen_worker.start()
 
     def stop(self):

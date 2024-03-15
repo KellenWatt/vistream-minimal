@@ -46,7 +46,7 @@ class MatchStream:
 
     def __init__(self, source: FrameSource, port: Optional[int] = None, stream_size: Optional[tuple[int, int]] = None, stream_rate: Optional[float] = None):
         if not hasattr(MatchStream, "socket_pool"):
-            raise "socket pool not initialized"
+            raise ValueError("socket pool not initialized")
         self.source = FrameSequencer(source)
         self.stream_size = stream_size
         self.stream_rate = stream_rate
@@ -61,7 +61,7 @@ class MatchStream:
         self.frame_connection_listener = MatchStream.socket_pool.allocate(port)
         self.frame_connection_listener.settimeout(1)
         if self.frame_connection_listener is None:
-            raise "out of valid sockets"
+            raise ValueError("out of valid sockets")
 
         self.frame_connections = []
         self.frame_connection_lock = Lock()
@@ -69,7 +69,7 @@ class MatchStream:
         self.match_connection_listener = MatchStream.socket_pool.allocate(None if port is None else port+1)
         self.match_connection_listener.settimeout(1)
         if self.match_connection_listener is None:
-            raise "out of valid sockets"
+            raise ValueError("out of valid sockets")
 
         self.match_connections = []
         self.match_connection_lock = Lock()
@@ -149,7 +149,7 @@ class MatchStream:
 
     def start(self):
         if self.terminate_call.is_set():
-            raise "cannot restart a terminated stream"
+            raise ValueError("cannot restart a terminated stream")
         self.frame_listener.start()
         self.match_listener.start()
         self.match_worker.start()

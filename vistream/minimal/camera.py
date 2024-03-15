@@ -20,29 +20,29 @@ class FrameSource:
         However, blocking is assumed to be the default, and blocking operations should
         never return `None`.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def source(self) -> Any:
         """Returns the raw, root frame source. This will most often be a class representing 
         some kind of camera, and does not guarantee any API.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def frame_size(self) -> tuple[int, int]:
         """The size of the default frame returned, in pixels. Required for reconstructing 
         frame data on the client side
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def frame_id(self) -> int:
         """The id of the current frame. Generally assumed to increment for sequenctial frames, 
         but it's really only important that frames have unique ids over a reasonable period of time.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def field_of_view(self) -> tuple[float, float]:
         """The horizontal and vertical field-of-views of the root frame source, respectively."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
 class Camera(FrameSource):
     frame_grabber: Thread
@@ -93,13 +93,13 @@ class Camera(FrameSource):
         return res
 
     def _next_frame_(self) -> Optional[np.ndarray]:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def source(self) -> Any:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def frame_size(self) -> tuple[int, int]:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def frame_id(self) -> int:
         return self._frameid
