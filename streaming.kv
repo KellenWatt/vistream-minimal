@@ -1,0 +1,38 @@
+#:kivy 1.9.0
+
+
+<StreamControl>:
+    stream: strem
+
+    Stream:
+        id: strem
+        address: "vision-2165.local"
+        port: 1180
+
+        # size: 1280, 720
+        size: 720,1280
+        # size: 640, 360
+        center: root.center
+
+
+    Button:
+        text: root.button_label 
+        background_color: root.button_color
+        size: strem.size[0], 100
+        x: strem.x
+        top: strem.y - 25
+        on_press: root.toggle_stream()
+
+<StreamBox>:
+    stream_a: stream_a
+
+    orientation: "horizontal"
+    StreamControl:
+        id: stream_a
+
+    # Stream:
+    #     address: "vision-2165.local"
+    #     port: 1180
+    # 
+    #     size: 720, 1280
+        

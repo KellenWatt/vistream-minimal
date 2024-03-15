@@ -1,0 +1,4 @@
+/reductions
+*.png
+*.jpg
+__pycache__

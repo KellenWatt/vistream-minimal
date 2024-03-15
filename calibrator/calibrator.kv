@@ -1,0 +1,33 @@
+#:kivy 1.9.0
+
+<CaptureCamera>:
+    live_feed: live
+    checker: checker
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.size
+
+        BoxLayout:
+            orientation: "horizontal"
+
+            Image:
+                id: live
+                # index: 0
+                # resolution: 640, 480
+               
+            Image:
+                id: checker
+ 
+        BoxLayout:
+            orientation: "horizontal"
+
+            Button:
+                id: pause
+                text: root.playback
+                on_press: root.pause_play()
+            
+            Button:
+                id: cap
+                text: "Capture"
+                on_press: root.capture_proc()
