@@ -1,0 +1,75 @@
+#:kivy 1.9.0
+
+<CalSlider@Slider>:
+    min: 0
+    max: 255
+    step: 1
+
+<RangeSliderGroup>:
+    low: low
+    high: high
+
+    orientation: "horizontal"
+
+    Label:
+        size_hint: 0.2, 1
+        text: root.label
+
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+
+    BoxLayout:
+        orientation: "vertical"
+        size_hint: 0.8, 1
+        CalSlider:
+            id: low
+            on_value: root.bound_low()
+
+        CalSlider:
+            id: high
+            value: self.max
+            on_value: root.bound_high()
+    
+    # Label:
+    #     size_hint: 0.2, 1
+    #     text: root.range_label
+
+
+
+
+<SliderCalibrator>:
+    hue: hue
+    sat: sat
+    val: val
+
+    orientation: "vertical"    
+    host: "vision-2165.local"
+    port: 5810
+
+
+    RangeSliderGroup:
+        id: hue
+        name: "Hue"
+
+    RangeSliderGroup:
+        id: sat
+        name: "Saturation"
+
+    RangeSliderGroup:
+        id: val
+        name: "Value"
+
+    Button:
+        text: "Update"
+        on_press: root.update_calibrator()
+        
+    Stream:
+        address: "vision-2165.local"
+        port: 1184
+        size_hint_x: None
+        size_hint_y: None
+
+        size: 1280, 720
+
+        
