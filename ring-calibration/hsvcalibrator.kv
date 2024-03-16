@@ -43,33 +43,48 @@
     sat: sat
     val: val
 
+    raw: raw
+    mask: mask
+
     orientation: "vertical"    
-    host: "vision-2165.local"
-    port: 5810
 
+    BoxLayout: 
+        orientation: "vertical"
+        size_hint_y: 0.35
+        RangeSliderGroup:
+            id: hue
+            name: "Hue"
 
-    RangeSliderGroup:
-        id: hue
-        name: "Hue"
+        RangeSliderGroup:
+            id: sat
+            name: "Saturation"
 
-    RangeSliderGroup:
-        id: sat
-        name: "Saturation"
+        RangeSliderGroup:
+            id: val
+            name: "Value"
 
-    RangeSliderGroup:
-        id: val
-        name: "Value"
-
-    Button:
-        text: "Update"
-        on_press: root.update_calibrator()
+        # Button:
+        #     text: "Update"
+        #     on_press: root.update_calibrator()
         
-    Stream:
-        address: "vision-2165.local"
-        port: 1184
-        size_hint_x: None
-        size_hint_y: None
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.65
+        Stream:
+            id: raw
+            address: "vision-2165.local"
+            port: 1184
+            size_hint_x: None
+            size_hint_y: None
 
-        size: 1280, 720
+            size: 640, 360
+
+            on_texture: root.update_mask()
+
+        Image:
+            id: mask
+            size_hint_x: None
+            size_hint_y: None
+            size: 1280, 720
 
         
