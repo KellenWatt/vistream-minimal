@@ -106,34 +106,12 @@ class SliderCalibrator(BoxLayout, EventDispatcher):
     sat = ObjectProperty(None)
     val = ObjectProperty(None)
 
-    host = StringProperty(None)
-    port = NumericProperty(None)
+    #  host = StringProperty(None)
+    #  port = NumericProperty(None)
   
     raw = ObjectProperty(None)
     mask = ObjectProperty(None)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        #  self.sender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #  self.sender.settimeout(1)
-        #  self.sender.connect((self.host, self.port))
-
-        #  self.last_sent = bytearray(6)
-
-    def update_calibrator(self):
-        bs = bytearray(6)
-        #  bs[0] = int(self.hue.low.value)
-        #  bs[1] = int(self.hue.high.value)
-        #  bs[2] = int(self.sat.low.value)
-        #  bs[3] = int(self.sat.high.value)
-        #  bs[4] = int(self.val.low.value)
-        #  bs[5] = int(self.val.high.value)
-
-        #  if self.last_sent != bs:
-        #      print("new values")
-        #      self.sender.send(bs)
-        #      self.last_sent = bs
 
     @property
     def low(self) -> np.ndarray:
@@ -155,33 +133,6 @@ class SliderCalibrator(BoxLayout, EventDispatcher):
         tex.blit_buffer(cv.cvtColor(mask, cv.COLOR_GRAY2RGB).tobytes(), colorfmt="rgb")
         tex.flip_vertical()
         self.mask.texture = tex
-
-
-    #  def match_rings(frame: np.ndarray) -> list[MatchData]:
-    #      img_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV_FULL)
-    #      mask = cv.inRange(img_hsv, np.array([7, 65, 205]), np.array([35, 255, 255]))
-    #      contours, hierarchy = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    #      out = cv.cvtColor(mask, cv.COLOR_GRAY2RGB)
-    #  
-    #      matches = []
-    #  
-    #      for c in contours:
-    #          perimeter = cv.arcLength(c, True)
-    #          if perimeter == 0:
-    #              continue
-    #  
-    #          area = cv.contourArea(c)
-    #          roundness = 4 * math.pi * area/(perimeter * perimeter)
-    #  
-    #          full_match = roundness > 0.6
-    #          x,y,w,h = cv.boundingRect(c)
-    #  
-    #          if w > 0.06 * frame.shape[1]  and h > 0.03 * frame.shape[0]:
-    #              match = MatchData(x, y, w, h, full_match, None)
-    #              matches.append(match)
-    #  
-    #      return matches
-    #  
 
 
 class HSVCalibratorApp(App):
