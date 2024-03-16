@@ -15,11 +15,11 @@ class ContextualMatchData(MatchData):
         return BoundingBox(self.box.x - origin.x, self.box.y - origin.y, self.box.width, self.box.height)
  
     def normal_position(self) -> tuple[float, float]:
-        width = self.box.width
-        height = self.box.height
+        #  width = self.box.width
+        #  height = self.box.height
         pos = self.box.center()
-        x_norm = pos.x / width
-        y_norm = pos.y / height
+        x_norm = pos.x / type(self).FRAME_SIZE[0]
+        y_norm = pos.y / type(self).FRAME_SIZE[1]
         x_norm = x_norm * 2 - 1
         y_norm = y_norm * 2 - 1
         return (x_norm, -y_norm)
@@ -57,7 +57,8 @@ class ContextualMatchData(MatchData):
 class GamePieceMatchData(ContextualMatchData):
     SIZE = 0 # px @ 1m
     REAL_SIZE = 0.3556 # size in meters
-    FOV = (65.368, 36.770)
+    FOV = (102, 67)
+    FRAME_SIZE = (640, 360)
 
 def _for_game_piece(self) -> GamePieceMatchData:
     self.__class__ = GamePieceMatchData
@@ -68,7 +69,8 @@ MatchData.for_game_piece = _for_game_piece
 class AprilTagMatchData(ContextualMatchData):
     SIZE = 0 # px @ 1m
     REAL_SIZE = 0.1651
-    FOV = (136.0, 102.0)
+    FOV = (136.0, 102.0) # Currently unknown quantity
+    FRAME_SIZE = (640, 360)
 
 
 def _for_apriltag(self) -> AprilTagMatchData:
