@@ -44,12 +44,13 @@ class MatchStream:
     def create_socket_pool(cls, start, end):
         cls.socket_pool = SocketPool(start, end)
 
-    def __init__(self, source: FrameSource, port: Optional[int] = None, stream_size: Optional[tuple[int, int]] = None, stream_rate: Optional[float] = None):
+    def __init__(self, source: FrameSource, port: Optional[int] = None, stream_size: Optional[tuple[int, int]] = None, stream_rate: Optional[float] = None, compressed: bool = True):
         if not hasattr(MatchStream, "socket_pool"):
             raise ValueError("socket pool not initialized")
         self.source = FrameSequencer(source)
         self.stream_size = stream_size
         self.stream_rate = stream_rate
+        self.compressed = compressed
         self.last_frame = 0
         if stream_rate is not None and stream_rate > 0:
             self.frame_delay = 1 / stream_rate
@@ -132,7 +133,7 @@ class MatchStream:
                 
                 if self.stream_size is not None:
                     frame = cv.resize(frame, self.stream_size)
-                msg = format_frame(frame)
+                msg = format_frame(frame, compressed = self.compressed)
                 bads = []
                 for c in self.frame_connections:
                     try:

@@ -10,14 +10,16 @@ from typing import Optional, Any
 #TODO Explore variable compression at lower framerates
 
 FRAME_MAGIC_FLAG = bs.Bits(hex="99c3e3c5efe55837", length=64).bytes
-def format_frame(frame: np.ndarray) -> bytes:
+def format_frame(frame: np.ndarray, compressed: bool = True) -> bytes:
     msg = bytearray(FRAME_MAGIC_FLAG)
-    #  msg.extend(bs.pack(["uintbe16", "uintbe16"], frame.shape[1], frame.shape[0]).bytes)
     # This heavy compression leads to very low image quality, but also extremely small packet sizes
-    compressed = cv.imencode(".jpg", frame, [cv.IMWRITE_JPEG_QUALITY, 9])[1].data # we're just going to assume it succeeds
-    #  compressed = zlib.compress(frame.tobytes(), level = 4) # lower level to make faster, since we're streaming
-    msg.extend(bs.pack(["uintbe32"], len(compressed)).bytes)
-    msg.extend(compressed)
+    if compressed:
+        comp = cv.imencode(".jpg", frame, [cv.IMWRITE_JPEG_QUALITY, 9])[1].data # we're just going to assume it succeeds
+    else:
+        comp = cv.imencode(".png", frame)[1].data # we're just going to assume it succeeds
+        #  comp = zlib.compress(frame.tobytes(), level = 4) # lower level to make faster, since we're streaming
+    msg.extend(bs.pack(["uintbe32"], len(comp)).bytes)
+    msg.extend(comp)
 
     return bytes(msg)
 
@@ -86,6 +88,7 @@ def parse_data(sock: BufferedSocket) -> Optional[list[MatchData]]:
     return matches
 
 def salvage_data_stream(sock: BufferedSocket) -> bool:
+    print("trying to salvage stream")
     while sock.can_read():
         read = sock.peek(len(DATA_MAGIC_FLAG))
         if read is None or len(read) < len(DATA_MAGIC_FLAG):

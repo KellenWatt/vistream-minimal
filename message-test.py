@@ -2,8 +2,8 @@ from typing import Optional
 import cv2 as cv
 import numpy as np
 
-from vistream.minimal.message import *
-from vistream.minimal.match_data import MatchData
+from vistream.message import *
+from vistream.match_data import MatchData
 
 class BufferedSocket:
     data: bytearray

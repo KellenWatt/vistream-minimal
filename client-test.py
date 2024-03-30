@@ -1,4 +1,4 @@
-from vistream.minimal.client import FrameStreamClient, MatchDataStreamClient
+from vistream.client import FrameStreamClient, MatchDataStreamClient
 import socket
 import time
 import cv2 as cv

@@ -1,4 +1,4 @@
-from vistream.minimal.client import FrameStreamClient
+from vistream.client import FrameStreamClient
 import cv2 as cv
 import atexit
 import numpy as np
@@ -127,7 +127,7 @@ class SliderCalibrator(BoxLayout, EventDispatcher):
         img = cv.cvtColor(img, cv.COLOR_RGBA2RGB)
         img_hsv = cv.cvtColor(img, cv.COLOR_RGB2HSV_FULL)
         mask = cv.inRange(img_hsv, self.low, self.high)
-        mask = cv.resize(mask, (1280, 720))
+        mask = cv.resize(mask, self.mask.size)
 
         tex = Texture.create(size=self.mask.size)
         tex.blit_buffer(cv.cvtColor(mask, cv.COLOR_GRAY2RGB).tobytes(), colorfmt="rgb")

@@ -1,4 +1,5 @@
-from vistream.client import FrameStreamClient
+
+from vistream.client import FrameStreamClient, MatchDataStreamClient
 import cv2 as cv
 import atexit
 import numpy as np
@@ -25,11 +26,14 @@ class Stream(Image):
     address = StringProperty(None)
     port = NumericProperty(None)
 
+    processing_layer = ObjectProperty(None)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.frame_source = None
         Window.bind(on_request_close=lambda _junk: self.shutdown())
         self.stream_event = None
+        Clock.schedule_once(lambda _evt: self.start_stream(), 0.3)
 
     def start_stream(self):
         if self.frame_source is None:
@@ -51,57 +55,52 @@ class Stream(Image):
     def update(self):
         if self.frame_source.latest_result is not None:
             img = self.frame_source.latest_result
-            img = cv.flip(img, 0)
-            img = cv.resize(img, self.size)
-            #  img = cv.rotate(img, cv.ROTATE_90_COUNTERCLOCKWISE)
+            if self.processing_layer is not None:
+                img = self.processing_layer(img)
+            size = [int(s) for s in self.size]
+            img = cv.resize(img, size)
             bs = img.tobytes()
 
             tex = Texture.create(size=self.size)
             tex.blit_buffer(bs, colorfmt="bgr")
+            tex.flip_vertical()
             self.texture = tex
 
     def shutdown(self):
         self.stop_stream()
         if self.frame_source is not None:
-            self.frame_source.stop()
+            self.frame_source.stop() 
 
 
-class StreamControl(Widget):
-    button_label = StringProperty("Start")
-    button_color = StringProperty("green")
-    stream = ObjectProperty(None)
+class ATData(BoxLayout):
+    coords = ObjectProperty(None)
+    address = StringProperty(None)
+    port = NumericProperty(None)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.source = MatchDataStreamClient(self.address, self.port)
+        self.source.start()
+        #  Clock.schedule_once(lambda _: self.source.start())
+        Clock.schedule_interval(lambda _: self.update(), 1/60)
+        Window.bind(on_request_close=lambda _: self.source.stop())
 
-    def start_stream(self):
-        self.stream.start_stream()
-        self.button_label = "Pause"
-        self.button_color = "red"
+    def update(self):
+        if not self.source.has_result() or len(self.source.latest_result) == 0:
+            self.coords.text = "No data yet!"
+            return
+        data = self.source.latest_result
+        msg = ""
+        for m in data:
+            msg += f"ID: {m.fiducial_id}\nX: {m.x:.3f}\nY: {m.y:.3f}\nZ: {m.z:.3f}\n"
+        self.coords.text = msg
 
-    def stop_stream(self):
-        self.stream.stop_stream()
-        self.button_label = "Continue"
-        self.button_color = "green"
 
-    def toggle_stream(self):
-        if self.stream.is_enabled():
-            self.stop_stream()
-        else:
-            self.start_stream()
-
-class StreamBox(BoxLayout):
-    stream_a = ObjectProperty(None)
-    stream_b = ObjectProperty(None)
-    
-    def shutdown(self):
-        stream_a.shutdown()
-        stream_b.shutdown()
-
-class StreamingApp(App):
+class ATStream(App):
     def build(self):
-        self.capture = StreamBox()
-        return self.capture
-
-    def on_request_close(self, *args):
-        self.capture.shutdown()
+        return ATData()
 
 if __name__ == "__main__":
-    StreamingApp().run()
+    ATStream().run()
+
+

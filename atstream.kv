@@ -1,0 +1,20 @@
+#:kivy 1.0.9
+
+
+<ATData>:
+    coords: coords
+    orientation: "vertical"
+
+    address: "vision-2165.local"
+    port: 1183
+
+    Stream:
+        address: root.address
+        port: root.port - 1
+
+        size: 1280, 720
+        size_hint_x: None
+        size_hint_y: None
+
+    Label:
+        id: coords
