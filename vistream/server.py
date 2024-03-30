@@ -83,6 +83,7 @@ class MatchStream:
                     with self.frame_connection_lock:
                         self.frame_connections.append(BufferedSocket(sock))
                 except TimeoutError:
+                    time.sleep(0.1)
                     pass
 
         self.frame_listener = Thread(target=frame_listener)
@@ -95,6 +96,7 @@ class MatchStream:
                     with self.match_connection_lock:
                         self.match_connections.append(BufferedSocket(sock))
                 except TimeoutError:
+                    time.sleep(0.1)
                     pass
 
         self.match_listener = Thread(target=match_listener)
@@ -105,12 +107,13 @@ class MatchStream:
         def detect_send():
             while not self.terminate_call.is_set():
                 if len(self.frame_connections) == 0 and len(self.match_connections) == 0:
+                    time.sleep(0.1)
                     continue
                 frame = self.source.get_frame()
                 if frame is None:
-                    time.sleep(0.01)
+                    time.sleep(0.05)
                     continue
-                if self.matcher is not None:
+                if self.matcher is not None and len(self.match_connections) > 0:
                     matches = self.matcher(frame)
                     if self.match_visualizer is not None:
                         frame = self.match_visualizer(frame, matches)
@@ -126,7 +129,9 @@ class MatchStream:
                     with self.match_connection_lock:
                         for c in bads:
                             self.match_connections.remove(c)
-
+                
+                if len(self.frame_connections) == 0:
+                    continue
                 if time.perf_counter() < self.last_frame + self.frame_delay:
                     continue
                 self.last_frame = time.perf_counter()

@@ -1,5 +1,6 @@
 import numpy as np
 import socket
+import time
 from threading import Thread, Lock, Event
 
 from typing import Optional
@@ -29,14 +30,19 @@ class FrameStreamClient:
         def listen_up():
             try:
                 while not self.terminate_call.is_set():
-                    res = parse_frame(self.listener)
-                    if res is not None:
-                        self.latest_result = res
-                    else:
-                        if not salvage_frame_stream(self.listener):
-                            raise ValueError("frame stream was corrupted and could not be salvaged")
+                    try:
+                        res = parse_frame(self.listener)
+                        if res is not None:
+                            self.latest_result = res
+                        else:
+                            if not salvage_frame_stream(self.listener):
+                                raise ValueError("frame stream was corrupted and could not be salvaged")
+                    except TimeoutError:
+                        time.sleep(0.1)
+                        continue
             except OSError:
                 self._latest_result = None
+                print("Something went wrong and the stream no longer works")
                 return
                     
 
@@ -87,14 +93,19 @@ class MatchDataStreamClient:
         def listen_up():
             try:
                 while not self.terminate_call.is_set(): 
-                    res = parse_data(self.listener)
-                    if res is not None:
-                        self.latest_result = res
-                    else: 
-                        if not salvage_data_stream(self.listener):
-                            raise ValueError("data stream was corrupted and could not be salvaged")
-            except TimeoutError:
+                    try:
+                        res = parse_data(self.listener)
+                        if res is not None:
+                            self.latest_result = res
+                        else: 
+                            if not salvage_data_stream(self.listener):
+                                raise ValueError("data stream was corrupted and could not be salvaged")
+                    except TimeoutError:
+                        time.sleep(0.1)
+                        continue
+            except OSError:
                 self._latest_result = None
+                print("Something went wrong and the stream no longer works")
                 return
 
         self.listen_worker = Thread(target=listen_up)

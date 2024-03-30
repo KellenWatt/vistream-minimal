@@ -32,7 +32,10 @@ class Stream(Image):
         self.stream_event = None
 
     def start_stream(self):
+        
         if self.frame_source is None:
+            self.frame = 0
+            print()
             self.frame_source = FrameStreamClient(self.address, self.port)
             self.frame_source.start()
         if self.stream_event is not None:
@@ -50,10 +53,11 @@ class Stream(Image):
 
     def update(self):
         if self.frame_source.latest_result is not None:
+            self.frame += 1
+            print(f"\rupdating frame {self.frame}", end="")
             img = self.frame_source.latest_result
             img = cv.flip(img, 0)
             img = cv.resize(img, self.size)
-            #  img = cv.rotate(img, cv.ROTATE_90_COUNTERCLOCKWISE)
             bs = img.tobytes()
 
             tex = Texture.create(size=self.size)
